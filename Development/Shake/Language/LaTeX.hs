@@ -11,12 +11,10 @@ import Control.Arrow (second)
 import Control.Monad (when)
 import Control.Monad.IO.Class (MonadIO(..))
 import Data.Char (isSpace)
-import Data.List (isPrefixOf, stripPrefix)
+import Data.List (stripPrefix)
 import Data.Maybe (isJust)
 import Development.Shake
 import Development.Shake.FilePath
-import System.Directory (getHomeDirectory)
-import System.Exit (ExitCode(ExitSuccess))
 import Text.Regex
 
 matches :: Regex -> String -> Bool
