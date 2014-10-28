@@ -29,8 +29,8 @@ pdflatex tex out = do
   let buildDir = takeDirectory out
       log = out -<.> "log"
       pdflatex options file =
-        command_ [] "pdflatex" $ [ "-jobname=" ++ dropExtension out
-                                 -- , "-output-directory=" ++ buildDir
+        command_ [] "pdflatex" $ [ "-jobname=" ++ dropExtension (takeFileName out)
+                                 , "-output-directory=" ++ buildDir
                                  , "-interaction=nonstopmode"
                                  , "-file-line-error" ]
                                  ++ options
