@@ -94,6 +94,7 @@ mkHyphenations =
 
 svgToPdf :: FilePath -> FilePath -> Action ()
 svgToPdf svg pdf = do
+  need [svg]
   command_ [] "/Applications/Inkscape.app/Contents/Resources/bin/inkscape"
               [ "--export-pdf=" ++ pdf
               , svg ]
