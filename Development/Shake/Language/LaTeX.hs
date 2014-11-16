@@ -12,6 +12,7 @@ import Control.Monad (when)
 import Control.Monad.IO.Class (MonadIO(..))
 import Data.Char (isSpace)
 import Data.List (stripPrefix)
+import qualified Data.Set as Set
 import Data.Maybe (isJust)
 import Development.Shake
 import Development.Shake.FilePath
@@ -41,9 +42,13 @@ pdflatex tex out = do
 
   -- Avoid a dependency on the fls file because it changes in every run
   fls <- liftIO $ readFile $ out -<.> "fls"
-  need $ -- Don't depend on files that change in every run
-         filter (not . flip elem [".aux", ".bbl", ".out"] . takeExtension)
-       $ [ x | Just x <- map (stripPrefix "INPUT ") (lines fls) ]
+  need
+     -- Normalise paths and build minimal set of dependencies
+   . Set.toList . Set.fromList . map normalise
+     -- Don't depend on files that change in every run
+   . filter (not . flip elem [".aux", ".bbl", ".out"] . takeExtension)
+     -- Get INPUT dependencies from fls file
+   $ [ x | Just x <- map (stripPrefix "INPUT ") (lines fls) ]
 
   let whenFileContains regex file action = do
         b <- grep (mkRegexWithOpts regex True False) file >>= return . not . null
