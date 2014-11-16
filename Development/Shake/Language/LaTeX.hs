@@ -29,15 +29,16 @@ pdflatex tex out = do
   let buildDir = takeDirectory out
       log = out -<.> "log"
       pdflatex options file =
-        command_ [] "pdflatex" $ [ "-jobname=" ++ dropExtension (takeFileName out)
-                                 , "-output-directory=" ++ buildDir
-                                 , "-interaction=nonstopmode"
-                                 , "-file-line-error" ]
-                                 ++ options
-                                 ++ [file]
+        command [] "pdflatex" $ [ "-jobname=" ++ dropExtension (takeFileName out)
+                                , "-output-directory=" ++ buildDir
+                                , "-interaction=nonstopmode"
+                                , "-file-line-error" ]
+                                ++ options
+                                ++ [file]
 
   -- Run pdflatex and record dependencies
-  pdflatex ["-recorder"] tex
+  () <- pdflatex ["-recorder"] tex
+
   -- Avoid a dependency on the fls file because it changes in every run
   fls <- liftIO $ readFile $ out -<.> "fls"
   need $ -- Don't depend on files that change in every run
