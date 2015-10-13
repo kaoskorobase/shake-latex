@@ -13,7 +13,7 @@ import Control.Monad.IO.Class (MonadIO(..))
 import Data.Char (isSpace)
 import Data.List (stripPrefix)
 import qualified Data.Set as Set
-import Data.Maybe (isJust)
+import Data.Maybe (isJust,mapMaybe)
 import Development.Shake
 import Development.Shake.FilePath
 import Text.Regex
@@ -48,7 +48,7 @@ pdflatex tex out = do
      -- Don't depend on files that change in every run
    . filter (not . flip elem [".aux", ".bbl", ".out"] . takeExtension)
      -- Get INPUT dependencies from fls file
-   $ [ x | Just x <- map (stripPrefix "INPUT ") (lines fls) ]
+   $ mapMaybe (stripPrefix "INPUT ") (lines fls)
 
   let whenFileContains regex file action = do
         b <- grep (mkRegexWithOpts regex True False) file >>= return . not . null
