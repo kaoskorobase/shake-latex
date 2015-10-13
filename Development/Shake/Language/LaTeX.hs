@@ -8,7 +8,7 @@ module Development.Shake.Language.LaTeX (
 ) where
 
 import Control.Arrow (second)
-import Control.Monad (when)
+import Control.Monad (when,replicateM_)
 import Control.Monad.IO.Class (MonadIO(..))
 import Data.Char (isSpace)
 import Data.List (stripPrefix)
@@ -71,8 +71,7 @@ pdflatex tex out = do
               log
               (pdflatex [] tex)
 
-  rerun
-  rerun
+  replicateM_ 2 rerun
 
 mapFileLines :: (String -> String) -> FilePath -> FilePath -> Action ()
 mapFileLines f inFile outFile =
