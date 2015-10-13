@@ -23,7 +23,8 @@ matches regex = isJust . matchRegex regex
 
 grep :: MonadIO m => Regex -> FilePath -> m [String]
 grep regex file = liftIO $
-  readFile file >>= return . filter (matches regex) . lines
+  fmap (filter (matches regex) . lines)
+       (readFile file)
 
 pdflatex :: FilePath -> FilePath -> Action ()
 pdflatex tex out = do
