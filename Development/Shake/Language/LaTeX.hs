@@ -82,15 +82,15 @@ mapFileLines f inFile outFile =
 
 mkAcronyms :: FilePath -> FilePath -> Action ()
 mkAcronyms =
-  mapFileLines
-    (\x -> let (acr, def) = second (dropWhile isSpace . tail)
-                          . break (==':') $ x
-           in concat ["\\newacronym{", acr, "}{", acr, "}{", def, "}"])
+  mapFileLines $ \x ->
+    let (acr, def) = second (dropWhile isSpace . tail)
+                   . break (==':') $ x
+    in concat ["\\newacronym{", acr, "}{", acr, "}{", def, "}"]
 
 mkHyphenations :: FilePath -> FilePath -> Action ()
 mkHyphenations =
-  mapFileLines
-    (\x -> concat ["\\hyphenation{", x, "}"])
+  mapFileLines $ \x ->
+    concat ["\\hyphenation{", x, "}"]
 
 svgToPdf :: FilePath -> FilePath -> Action ()
 svgToPdf svg pdf = do
