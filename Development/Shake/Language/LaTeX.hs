@@ -8,12 +8,12 @@ module Development.Shake.Language.LaTeX (
 ) where
 
 import Control.Arrow (second)
-import Control.Monad (when)
+import Control.Monad (when,replicateM_)
 import Control.Monad.IO.Class (MonadIO(..))
 import Data.Char (isSpace)
 import Data.List (stripPrefix)
 import qualified Data.Set as Set
-import Data.Maybe (isJust)
+import Data.Maybe (isJust,mapMaybe)
 import Development.Shake
 import Development.Shake.FilePath
 import Text.Regex
@@ -49,7 +49,7 @@ pdflatex tex out = do
      -- Don't depend on files that change in every run
    . filter (not . flip elem [".aux", ".bbl", ".out"] . takeExtension)
      -- Get INPUT dependencies from fls file
-   $ [ x | Just x <- map (stripPrefix "INPUT ") (lines fls) ]
+   $ mapMaybe (stripPrefix "INPUT ") (lines fls)
 
   let whenFileContains regex file action = do
         b <- grep (mkRegexWithOpts regex True False) file >>= return . not . null
@@ -72,8 +72,7 @@ pdflatex tex out = do
               log
               (pdflatex [] tex)
 
-  rerun
-  rerun
+  replicateM_ 2 rerun
 
 mapFileLines :: (String -> String) -> FilePath -> FilePath -> Action ()
 mapFileLines f inFile outFile =
