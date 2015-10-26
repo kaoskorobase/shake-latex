@@ -3,6 +3,9 @@ module Development.Shake.Language.LaTeX (
     pdflatex
   , mkAcronyms
   , mkHyphenations
+  , InkscapeOptions(..)
+  , defaultInkscapeOptions
+  , svgToPdfWithOptions
   , svgToPdf
   , grep
 ) where
@@ -16,6 +19,7 @@ import qualified Data.Set as Set
 import Data.Maybe (isJust)
 import Development.Shake
 import Development.Shake.FilePath
+import qualified System.Info as System
 import Text.Regex
 
 matches :: Regex -> String -> Bool
@@ -93,9 +97,27 @@ mkHyphenations =
   mapFileLines $ \x ->
     concat ["\\hyphenation{", x, "}"]
 
-svgToPdf :: FilePath -> FilePath -> Action ()
-svgToPdf svg pdf = do
+data InkscapeOptions = InkscapeOptions {
+    inkscapeExecutable :: FilePath
+  } deriving (Show)
+
+defaultInkscapeOptions :: InkscapeOptions
+defaultInkscapeOptions =
+  InkscapeOptions {
+    inkscapeExecutable =
+        case System.os of
+          "darwin"  -> "/Applications/Inkscape.app/Contents/Resources/bin/inkscape"
+          _         -> "inkscape"
+  }
+
+-- | Call Inkscape with options to convert SVG file to PDF.
+svgToPdfWithOptions :: InkscapeOptions -> FilePath -> FilePath -> Action ()
+svgToPdfWithOptions options svg pdf = do
   need [svg]
-  command_ [] "/Applications/Inkscape.app/Contents/Resources/bin/inkscape"
+  command_ [] (inkscapeExecutable options)
               [ "--export-pdf=" ++ pdf
               , svg ]
+
+-- | Call Inkscape with default options to convert SVG to PDF.
+svgToPdf :: FilePath -> FilePath -> Action ()
+svgToPdf = svgToPdfWithOptions defaultInkscapeOptions
